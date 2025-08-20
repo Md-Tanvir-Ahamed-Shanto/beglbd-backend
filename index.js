@@ -603,13 +603,13 @@ app.patch("/update_counselor_data/:id", async (req, res) => {
 // -----------------
 // Sample route
 app.get("/", (req, res) => {
-  res.send("✅ The server is running");
+  res.send("✅ The bd server is running");
 });
 
 // -----------------
 // Start server
 app.listen(port, () => {
   console.log(
-    `🚀 Server is running on port ${port}`
+    `🚀the bd Server is running on port ${port}`
   );
 });
