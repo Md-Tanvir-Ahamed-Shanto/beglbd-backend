@@ -599,6 +599,27 @@ app.patch("/update_counselor_data/:id", async (req, res) => {
   }
 });
 
+// !new api for upload document--->
+app.patch("/add_new_document/:phoneNumberLead", async (req, res) => {
+  try {
+    const { phoneNumberLead } = req.params; // matches the URL param
+    const documents = req.body; // your documents array
+
+    const query = { phone: phoneNumberLead };
+    const update = { $set: { documents: documents } };
+
+    const result = await LeadCollection.updateOne(query, update, {
+      upsert: true,
+    });
+    // upsert: true creates new doc if phone not found
+
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Server error" });
+  }
+});
+
 // main api section ends here --->
 // -----------------
 // Sample route
@@ -609,7 +630,5 @@ app.get("/", (req, res) => {
 // -----------------
 // Start server
 app.listen(port, () => {
-  console.log(
-    `🚀the bd Server is running on port ${port}`
-  );
+  console.log(`🚀the bd Server is running on port ${port}`);
 });
