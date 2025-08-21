@@ -66,6 +66,10 @@ let PertnerCollections;
 let FAQCollections;
 let ContactsCollections;
 let AdminCollections;
+// new  collection
+let MetarialCollections;
+let BlogsCollections;
+let CategoryCollections;
 
 // -----------------
 // Run MongoDB connection
@@ -84,6 +88,10 @@ async function run() {
     FAQCollections = db.collection("FAQs");
     ContactsCollections = db.collection("Contacts");
     AdminCollections = db.collection("Admins");
+    // new  collecitons-->
+    MetarialCollections = db.collection("Metarials");
+    BlogsCollections = db.collection("Blogs");
+    CategoryCollections = db.collection("Category");
 
     console.log("✅ Successfully connected to MongoDB!");
   } catch (error) {
@@ -617,6 +625,131 @@ app.patch("/add_new_document/:phoneNumberLead", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ error: "Server error" });
+  }
+});
+//! metarial managements  api----->
+app.get("/all_metarial_data", async (req, res) => {
+  const result = await MetarialCollections.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/post_a_new_metarila", async (req, res) => {
+  const data = req.body;
+  const result = await MetarialCollections.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_metarila_data/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await MetarialCollections.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.patch("/delete_metarila_data/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await MetarialCollections.deleteOne(query);
+  res.send(result);
+});
+
+app.patch("/increment_download/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+
+    const updatedDoc = {
+      $inc: { downloads: 1 },
+    };
+
+    const result = await MetarialCollections.updateOne(query, updatedDoc);
+
+    if (result.modifiedCount > 0) {
+      res.send({ success: true, message: "Download count updated" });
+    } else {
+      res.status(404).send({ success: false, message: "Material not found" });
+    }
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .send({ success: false, message: "Failed to update download count" });
+  }
+});
+
+//! category management api---->
+app.get("/all_category_data", async (req, res) => {
+  const result = await CategoryCollections.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/post_a_new_category", async (req, res) => {
+  const data = req.body;
+  const result = await CategoryCollections.insertOne(data);
+  res.send(result);
+});
+app.patch("/delete_category_data/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await CategoryCollections.deleteOne(query);
+  res.send(result);
+});
+//! blogs managements  api----->
+app.get("/all_blogs_data", async (req, res) => {
+  const result = await BlogsCollections.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.get("/blog/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await BlogsCollections.findOne(query);
+  res.send(result);
+});
+app.post("/post_a_new_blog", async (req, res) => {
+  const data = req.body;
+  const publishDate = new Date().toDateString();
+  const finalData = { ...data, publishDate };
+  const result = await BlogsCollections.insertOne(finalData);
+  res.send(result);
+});
+app.patch("/update_blog_data/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await BlogsCollections.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.patch("/delete_blog_data/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await BlogsCollections.deleteOne(query);
+  res.send(result);
+});
+// increament views---->
+app.patch("/add_views/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = { _id: new ObjectId(id) };
+
+    const updatedDoc = {
+      $inc: { views: 1 }, // views না থাকলেও MongoDB নিজে 0 থেকে ধরবে
+    };
+
+    const result = await BlogsCollections.updateOne(query, updatedDoc, {
+      upsert: true,
+    });
+
+    if (result.modifiedCount > 0 || result.upsertedCount > 0) {
+      res.send({ success: true, message: "View count updated" });
+    } else {
+      res.status(404).send({ success: false, message: "Blog not found" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ success: false, message: "Failed to update views" });
   }
 });
 
