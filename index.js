@@ -44,7 +44,7 @@ const upload = multer({
 
 // -----------------
 // MongoDB connection URI
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.shn5wut.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.oaguo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // MongoDB Client Setup
 const client = new MongoClient(uri, {
